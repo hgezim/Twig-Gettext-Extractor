@@ -69,9 +69,33 @@ class Extractor
 
     public function extract()
     {
+        /**
+         * Escape parameters so they can be executed in a shell.
+         * For example, ensures that arguments like --copyright-holder='Zip Recipes' are escaped properly.
+         * @param string $param Argument or option passed to a command
+         *
+         * @return string Escaped argument when escaping is needed
+         */
+        $escapeParams = function($param) {
+            if ($param[0] !== "-") { // doesn't start with so must be an argument
+                return escapeshellarg($param);
+            }
+
+            // escape part after =
+            $parts = explode("=", $param);
+            if (count($parts) > 1) {
+                $parts[1] = escapeshellarg($parts[1]);
+                return implode('=', $parts);
+            }
+
+            return $param;
+        };
+
         $command = 'xgettext';
-        $command .= ' '.implode(' ', $this->parameters);
-        $command .= ' '.implode(' ', $this->templates);
+        $escapedParams = array_map($escapeParams, $this->parameters);
+        $command .= ' '.implode(' ', $escapedParams);
+        $escapedTemplates = array_map($escapeParams, $this->templates);
+        $command .= ' '.implode(' ', $escapedTemplates);
 
         $error = 0;
         $output = system($command, $error);
