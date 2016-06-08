@@ -22,6 +22,8 @@ if (file_exists($a = __DIR__.'/../../autoload.php')) {
     require_once __DIR__.'/vendor/autoload.php';
 }
 
+require_once __DIR__ . '/../../../_inc/WP_I18n_Twig_Extension.php';
+
 $twig = new Twig_Environment(new Twig\Gettext\Loader\Filesystem('/'), array(
     'cache'       => '/tmp/cache/'.uniqid(),
     'auto_reload' => true
@@ -38,6 +40,8 @@ $twig->addExtension(new Symfony\Bridge\Twig\Extension\FormExtension(
         new Symfony\Bridge\Twig\Form\TwigRendererEngine()
     )
 ));
+
+$twig->addExtension(new ZRDN\WP_I18n_Twig_Extension());
 // You can add more extensions here.
 
 array_shift($_SERVER['argv']);
